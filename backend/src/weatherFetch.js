@@ -2,7 +2,7 @@
 
 const { callbackify } = require('util');
 
-async function fetchWeather(zipcode, callback) {
+function fetchWeather(zipcode, callback) {
     const fs = require('fs');
     var unirest = require('unirest');
     var jsonQuery = require('json-query')
@@ -12,7 +12,7 @@ async function fetchWeather(zipcode, callback) {
     let zipcodeGeo = JSON.parse(data);
     let latLon = jsonQuery(`fields[zip=${zipcode}].geopoint`, {data: zipcodeGeo})["value"];
 
-    const res = await unirest
+    const res = unirest
         .get("https://api.openweathermap.org/data/2.5/onecall")
         .query({
             "lat": latLon[0],
