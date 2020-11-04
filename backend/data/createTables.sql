@@ -1,6 +1,6 @@
 CREATE TABLE cities (
-	city TEXT NOT NULL PRIMARY KEY,
-	zipcode TEXT NOT NULL,
+	zipcode TEXT NOT NULL PRIMARY KEY,
+	city TEXT NOT NULL,
 	state TEXT NOT NULL
 );
 
