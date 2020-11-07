@@ -1,12 +1,12 @@
 'use strict';
 
 const fs = require('fs');
-var weather = require('../src/weatherAPI.js');
+const weather = require('../src/weatherAPI.js');
 
 module.exports = {
     createCitiesTable: async function (db) {
         try {
-            let data = fs.readFileSync("backend/zipcode-geo-us.json");
+            let data = fs.readFileSync("../../zipcode-geo-us.json");
             let zipcodeGeo = JSON.parse(data);
             let stmt = await db.prepare("INSERT OR REPLACE INTO cities (zipcode, city, state, lat, lon) VALUES(@zipcode, @city, @state, @lat, @lon)");
             for (let i = 0; i < zipcodeGeo.length; i++) {
@@ -36,12 +36,25 @@ module.exports = {
             throw new Error(err);
         }
     },
-    getLatLon: async function (db, zipcode) {
+    checkZipInWeather: async function (db, zipcode) {
         try {
-            let stmt = await db.prepare("SELECT lat, lon FROM cities WHERE zipcode = @zipcode");
+            let stmt = await db.prepare("SELECT * FROM weather WHERE zipcode = @zipcode");
+            let res = await stmt.get({"@zipcode": zipcode});
+            stmt.finalize();
+            if (!res) {
+                return false;
+            }
+            return true;
+        } catch (err) {
+
+        }
+    },
+    getZipInfo: async function (db, zipcode) {
+        try {
+            let stmt = await db.prepare("SELECT city, state, lat, lon FROM cities WHERE zipcode = @zipcode");
             let results = await stmt.get({'@zipcode': zipcode});
             stmt.finalize();
-            return [results.lat, results.lon];
+            return {city: results.city, state: results.state, lat: results.lat, lon: results.lon};
         } catch (err) {
             throw new Error(err);
         }
@@ -106,7 +119,7 @@ module.exports = {
             let state = cityResult.state;
             await cityStmt.finalize();
             await weatherStmt.finalize();
-            return [city, state, pop, temp, name]
+            return {city: city, state: state, pop: pop, temp: temp, name: name};
         } catch (err) {
             throw new Error(err);
         }
