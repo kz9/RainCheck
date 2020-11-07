@@ -29,10 +29,10 @@ module.exports = {
         try {
             let email = req.query.email;
             let phone = req.query.phone;
-            let zip = req.query.zipcode;
+            let zipcode = req.query.zipcode;
             let databasePath = path.join(__dirname, '..', 'data', 'raincheckDatabase.db')
             const sqlitedb = await open({filename: databasePath, driver: sqlite3.Database});
-            let res = await database.addOrUpdateUser(sqlitedb, email, phone, zip);
+            let res = await database.addOrUpdateUser(sqlitedb, email, phone, zipcode);
             res.json({success: res});
         } catch (err) {
             throw new Error(err);
