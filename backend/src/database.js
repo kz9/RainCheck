@@ -8,12 +8,14 @@ module.exports = {
         try {
             let data = fs.readFileSync("backend/zipcode-geo-us.json");
             let zipcodeGeo = JSON.parse(data);
-            let stmt = await db.prepare("INSERT OR REPLACE INTO cities (zipcode, city, state) VALUES(@zipcode, @city, @state)");
+            let stmt = await db.prepare("INSERT OR REPLACE INTO cities (zipcode, city, state, lat, lon) VALUES(@zipcode, @city, @state, @lat, @lon)");
             for (let i = 0; i < zipcodeGeo.length; i++) {
                 let zip = zipcodeGeo[i]["fields"]["zip"];
                 let city = zipcodeGeo[i]["fields"]["city"];
                 let state = zipcodeGeo[i]["fields"]["state"];
-                await stmt.bind({'@zipcode': zip, '@city': city, '@state': state})
+                let lat = zipcodeGeo[i]["fields"]["geopoint"][0];
+                let lon = zipcodeGeo[i]["fields"]["geopoint"][1];
+                await stmt.bind({'@zipcode': zip, '@city': city, '@state': state, '@lat': lat, '@lon': lon});
                 stmt.run();
             } 
             await stmt.finalize();
@@ -21,78 +23,89 @@ module.exports = {
             throw new Error(err);
         }
     },
-    addUsers: async function (db, email, phone, zipcode) {
-        return new Promise(function(resolve, reject) {
-            try{
-                //check email
-                if (phone.length != 10 && phone != null) {
-                    reject("Wrong phone number.")
-                }
-                let checkStmt = await db.prepare("SELECT * FROM users WHERE email = @email");
-                let checkResult = await checkStmt.get({"@email": email});
-                if (!checkResult) {
-                    let addStmt = await db.prepare("INSERT INTO users (email, phone, zipcode) VALUES(@email, @phone, @zipcode)");
-                    addStmt.run({"@email": email, "@phone": phone, "@zipcode": zipcode});
-                    addStmt.finalize();
-                    resolve("Added user successfully.")
-                } else {
-                    resolve("Dupplicate user.");
-                }
-            } catch (err) {
-                reject(err);
+    checkZipcode: async function (db, zipcode) {
+        try {
+            let stmt = await db.prepare("SELECT * FROM cities WHERE zipcode = @zipcode");
+            let res = await stmt.get({"@zipcode": zipcode});
+            stmt.finalize();
+            if (!res) {
+                return false;
             }
-        });
+            return true;
+        } catch (err) {
+            throw new Error(err);
+        }
+    },
+    getLatLon: async function (db, zipcode) {
+        try {
+            let stmt = await db.prepare("SELECT lat, lon FROM cities WHERE zipcode = @zipcode");
+            let results = await stmt.get({'@zipcode': zipcode});
+            stmt.finalize();
+            return [results.lat, results.lon];
+        } catch (err) {
+            throw new Error(err);
+        }
+    },
+    addOrUpdateUser: async function (db, email, phone, zipcode) {
+        try{
+            const re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+            if (!re.test(String(email).toLowerCase())) {
+                return false;
+            }
+            if (phone.length != 10 && phone != null) {
+                return false;
+            }
+            let check = await this.checkZipcode(db, zipcode);
+            if (!check) {
+                return false;
+            }
+            let addStmt = await db.prepare("INSERT OR REPLACE INTO users (email, phone, zipcode) VALUES(@email, @phone, @zipcode)");
+            addStmt.run({"@email": email, "@phone": phone, "@zipcode": zipcode});
+            addStmt.finalize();
+            return true;
+        } catch (err) {
+            throw new Error(err);
+        }
+    },
+    getRainUsers: async function (db) {
+        try {
+            let stmt = await db.prepare("SELECT users.email, users.phone, users.zipcode, weather.pop, weather.temp, cities.city, cities.state "+
+                                        "FROM users INNER JOIN weather ON weather.zipcode = users.zipcode "+
+                                        "INNER JOIN cities ON cities.zipcode = users.zipcode "+
+                                        "WHERE weather.pop >= @pop OR weather.name = @name");
+            let results = await stmt.all({"@pop": 0.5, "@name": "Rain"});
+            await stmt.finalize();
+            return results;
+        } catch (err) {
+            throw new Error(err);
+        }
     },
     updateWeatherData: async function (db, zip, pop, temp, name) {
         try {
             let stmt = await db.prepare("INSERT OR REPLACE INTO weather (zipcode, pop, temp, name) VALUES(@zipcode, @pop, @temp, @name)");
-            await stmt.bind({'@zipcode': zip, '@pop': pop, '@temp': temp, '@name': name})
+            await stmt.bind({'@zipcode': zip, '@pop': pop, '@temp': temp, '@name': name});
             await stmt.run();
             await stmt.finalize();
         } catch (err) {
             throw new Error(err);
         }
     },
-    getWeatherData: async function (db, zipcode, city) {
+    getWeatherData: async function (db, zipcode) {
         try {
             if (zipcode === null && city === null) {
                 throw new Error("Both zipcode and city have null value.")
             }
-            let pop = null;
-            let temp = null;
-            let name = null;
-            let state = null;
-            if (zipcode) {
-                let weatherStmt = await db.prepare("SELECT * FROM weather WHERE zipcode = @zipcode");
-                let cityStmt = await db.prepare("SELECT * FROM cities WHERE zipcode = @zipcode");
-                let weatherResult = await weatherStmt.get({"@zipcode": zipcode});
-                pop = weatherResult.pop;
-                temp = weatherResult.temp;
-                name = weatherResult.name;
-                let cityResult = await cityStmt.get({"@zipcode": zipcode});
-                city = cityResult.city;
-                state = cityResult.state;
-                await cityStmt.finalize();
-                await weatherStmt.finalize();
-            } else {
-                let cityStmt = await db.prepare("SELECT * FROM cities WHERE city = @city COLLATE NOCASE");
-                let weatherStmt = await db.prepare("SELECT * FROM weather WHERE zipcode = @zipcode");
-                let cityResult = await cityStmt.get({'@city': city});
-                zipcode = cityResult.zipcode;
-                state = cityResult.state;
-                let weatherResult = await weatherStmt.get({'@zipcode': zipcode});
-                if (!weatherResult) {
-                    console.log(zipcode);
-                    let data = await weather.fetchWeather(zipcode);
-                    await this.updateWeatherData(db, data[0], data[1], data[2], data[3]);
-                    weatherResult = await weatherStmt.get({'@city': city});
-                }
-                pop = weatherResult.pop;
-                temp = weatherResult.temp;
-                name = weatherResult.name;
-                await weatherStmt.finalize();
-                await cityStmt.finalize();
-            }
+            let weatherStmt = await db.prepare("SELECT * FROM weather WHERE zipcode = @zipcode");
+            let cityStmt = await db.prepare("SELECT * FROM cities WHERE zipcode = @zipcode");
+            let weatherResult = await weatherStmt.get({"@zipcode": zipcode});
+            let pop = weatherResult.pop;
+            let temp = weatherResult.temp;
+            let name = weatherResult.name;
+            let cityResult = await cityStmt.get({"@zipcode": zipcode});
+            let city = cityResult.city;
+            let state = cityResult.state;
+            await cityStmt.finalize();
+            await weatherStmt.finalize();
             return [city, state, pop, temp, name]
         } catch (err) {
             throw new Error(err);

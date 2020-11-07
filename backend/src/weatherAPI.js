@@ -1,16 +1,13 @@
 'use strict';
 
-const fs = require('fs');
-const jsonQuery = require('json-query')
 const axios = require('axios').default;
+var database = require('../src/database.js');
 
 module.exports = {
-    fetchWeather: async function (zipcode) {
+    fetchWeather: async function (db, zipcode) {
         let apiKey = "c45594f61719575f7d835accecc4b6b5";
 
-        let data = fs.readFileSync("backend/zipcode-geo-us.json");
-        let zipcodeGeo = JSON.parse(data);
-        let latLon = jsonQuery(`fields[zip=${zipcode}].geopoint`, {data: zipcodeGeo})["value"];
+        let latLon = await database.getLatLon(db, zipcode);
 
         const res = await axios.get("https://api.openweathermap.org/data/2.5/onecall", {
                 params: {
