@@ -1,3 +1,5 @@
+'use strict';
+
 const weather = require('./interactApi.js');
 const database = require('./database.js');
 const path = require('path')

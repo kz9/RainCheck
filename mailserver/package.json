@@ -9,6 +9,8 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "smtp-server": "^3.7.0"
+    "smtp-server": "^3.7.0",
+    "sqlite": "^4.0.15",
+    "sqlite3": "^5.0.0"
   }
 }

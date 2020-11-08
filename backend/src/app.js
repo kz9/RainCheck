@@ -1,3 +1,5 @@
+'use strict';
+
 // Require packages and set the port
 const express = require('express');
 const createError = require('http-errors');
