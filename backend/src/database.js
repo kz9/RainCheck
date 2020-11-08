@@ -59,7 +59,7 @@ module.exports = {
             throw new Error(err);
         }
     },
-    addOrUpdateUser: async function (db, email, phone, zipcode) {
+    addOrUpdateUser: async function (db, email, zipcode) {
         try{
             const re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
             if (!re.test(String(email).toLowerCase())) {
@@ -79,7 +79,7 @@ module.exports = {
     },
     getRainUsers: async function (db) {
         try {
-            let stmt = await db.prepare("SELECT users.email, users.phone, users.zipcode, weather.pop, weather.temp, cities.city, cities.state "+
+            let stmt = await db.prepare("SELECT users.email, users.zipcode, weather.pop, weather.temp, cities.city, cities.state "+
                                         "FROM users INNER JOIN weather ON weather.zipcode = users.zipcode "+
                                         "INNER JOIN cities ON cities.zipcode = users.zipcode "+
                                         "WHERE weather.pop >= @pop OR weather.name = @name");
