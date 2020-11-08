@@ -8,7 +8,6 @@ CREATE TABLE cities (
 
 CREATE TABLE users (
     email TEXT NOT NULL PRIMARY KEY,
-    phone INTEGER,
     zipcode TEXT NOT NULL
 );
 

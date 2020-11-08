@@ -65,15 +65,12 @@ module.exports = {
             if (!re.test(String(email).toLowerCase())) {
                 return false;
             }
-            if (phone.length != 10 && phone != null) {
-                return false;
-            }
             let check = await this.checkZipcode(db, zipcode);
             if (!check) {
                 return false;
             }
-            let addStmt = await db.prepare("INSERT OR REPLACE INTO users (email, phone, zipcode) VALUES(@email, @phone, @zipcode)");
-            addStmt.run({"@email": email, "@phone": phone, "@zipcode": zipcode});
+            let addStmt = await db.prepare("INSERT OR REPLACE INTO users (email, zipcode) VALUES(@email, @zipcode)");
+            addStmt.run({"@email": email, "@zipcode": zipcode});
             addStmt.finalize();
             return true;
         } catch (err) {

@@ -28,11 +28,10 @@ module.exports = {
     userHandler: async function (req, res, next) {
         try {
             let email = req.query.email;
-            let phone = req.query.phone;
             let zipcode = req.query.zipcode;
             let databasePath = path.join(__dirname, '..', 'data', 'raincheckDatabase.db')
             const sqlitedb = await open({filename: databasePath, driver: sqlite3.Database});
-            let res = await database.addOrUpdateUser(sqlitedb, email, phone, zipcode);
+            let res = await database.addOrUpdateUser(sqlitedb, email, zipcode);
             res.json({success: res});
         } catch (err) {
             throw new Error(err);
