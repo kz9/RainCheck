@@ -1,7 +1,7 @@
 'use strict';
 
 const fs = require('fs');
-const weather = require('../src/weatherAPI.js');
+const weather = require('./interactApi.js');
 
 module.exports = {
     createCitiesTable: async function (db) {

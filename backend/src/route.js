@@ -1,5 +1,5 @@
-const weather = require('../src/weatherAPI.js');
-const database = require('../src/database.js');
+const weather = require('./interactApi.js');
+const database = require('./database.js');
 const path = require('path')
 const sqlite3 = require('sqlite3').verbose();
 const { open } = require('sqlite');

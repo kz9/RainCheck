@@ -5,7 +5,7 @@ const port = 23333;
 const bodyParser = require('body-parser');
 const app = express();
 const cors = require("cors");
-const route = require('../src/route.js')
+const route = require('./route.js')
 
 // Use Node.js body parsing middleware
 app.use(bodyParser.json());

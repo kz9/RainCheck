@@ -1,7 +1,7 @@
 'use strict';
 
 const axios = require('axios').default;
-const database = require('../src/database.js');
+const database = require('./database.js');
 
 module.exports = {
     fetchWeather: async function (db, zipcode) {
