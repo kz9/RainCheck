@@ -1,3 +1,7 @@
+*, *:before, *:after {
+  box-sizing: border-box;
+}
+
 body {
   margin: 0;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
@@ -7,7 +11,27 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
-code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
-    monospace;
+footer {
+  bottom: 0;
+  text-align: center;
+  padding-bottom: 10px;
+  color: purple;
+}
+
+header nav {
+  background-color: green;
+}
+
+.rainCheckBody {
+  position: absolute;
+}
+
+form {
+  position: fixed !important;
+  right: 0;
+  margin-right: 60px;
+}
+
+form button {
+  color: red !important;
 }
