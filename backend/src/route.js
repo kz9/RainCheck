@@ -10,19 +10,25 @@ module.exports = {
     weatherHandler: async function (req, res, next) {
         try {
             let zipcode = req.query.zipcode;
-            let databasePath = path.join(__dirname, '..', 'data', 'raincheckDatabase.db')
-            const sqlitedb = await open({filename: databasePath, driver: sqlite3.Database});
-            let zipInDatabase = await database.checkZipInWeather(sqlitedb, zipcode);
-            if (zipInDatabase) {
-                let data = await database.getWeatherData(sqlitedb, zipcode);
-                res.json(data)
+            if (!zipcode) {
+                res.json({error: "error"});
             } else {
-                let weatherData = await weather.fetchWeather(sqlitedb, zipcode);
-                let cityData = await database.getZipInfo(sqlitedb, zipcode);
-                res.json({city: cityData.city, state: cityData.state, pop: weatherData.pop, temp: weatherData.temp, name: weatherData.name});
-                await database.updateWeatherData(sqlitedb, zipcode, weatherData.pop, weatherData.temp, weatherData.name);
+                let databasePath = path.join(__dirname, '..', 'data', 'raincheckDatabase.db')
+                const sqlitedb = await open({filename: databasePath, driver: sqlite3.Database});
+                let zipInDatabase = await database.checkZipInWeather(sqlitedb, zipcode);
+                if (zipInDatabase) {
+                    let data = await database.getWeatherData(sqlitedb, zipcode);
+                    res.json(data)
+                } else if (!zipInDatabase) {
+                    res.json({error: "error"});
+                } else {
+                    let weatherData = await weather.fetchWeather(sqlitedb, zipcode);
+                    let cityData = await database.getZipInfo(sqlitedb, zipcode);
+                    res.json({city: cityData.city, state: cityData.state, pop: weatherData.pop, temp: weatherData.temp, name: weatherData.name});
+                    await database.updateWeatherData(sqlitedb, zipcode, weatherData.pop, weatherData.temp, weatherData.name);
+                }
+                await sqlitedb.close();
             }
-            await sqlitedb.close();
         } catch (err) {
             throw new Error(err);
         }
@@ -31,10 +37,14 @@ module.exports = {
         try {
             let email = req.query.email;
             let zipcode = req.query.zipcode;
-            let databasePath = path.join(__dirname, '..', 'data', 'raincheckDatabase.db')
-            const sqlitedb = await open({filename: databasePath, driver: sqlite3.Database});
-            let res = await database.addOrUpdateUser(sqlitedb, email, zipcode);
-            res.json({success: res});
+            if (!zipcode || !email) {
+                res.json({error: "error"});
+            } else {
+              let databasePath = path.join(__dirname, '..', 'data', 'raincheckDatabase.db')
+              const sqlitedb = await open({filename: databasePath, driver: sqlite3.Database});
+              let res = await database.addOrUpdateUser(sqlitedb, email, zipcode);
+              res.json({success: res});
+            }
         } catch (err) {
             throw new Error(err);
         }
