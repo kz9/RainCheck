@@ -39,10 +39,10 @@ app.use(function(err, req, res, next) {
     res.status(err.status || 500);
     res.json({error: "error"})
 });
- 
+
 // Start the server
-const server = app.listen(port, (error) => {
+const server = app.listen(port, 'localhost', (error) => {
     if (error) return console.log(`Error: ${error}`);
- 
+
     console.log(`Server listening on port ${server.address().port}`);
 });
