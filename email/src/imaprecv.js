@@ -5,7 +5,7 @@ const sqlite3 = require('sqlite3').verbose();
 const { open } = require('sqlite');
 const path = require('path');
 const database = require('./database.js')
- 
+
 const config = {
     imap: {
         user: 'mailadmin',
@@ -16,19 +16,19 @@ const config = {
         authTimeout: 90000
     }
 };
- 
+
 imaps.connect(config).then(function (connection) {
- 
+
     return connection.openBox('INBOX').then(function () {
         var searchCriteria = [
             'UNSEEN'
         ];
- 
+
         var fetchOptions = {
             bodies: ['HEADER', 'TEXT'],
-            markSeen: false
+            markSeen: true
         };
- 
+
         return connection.search(searchCriteria, fetchOptions).then(function (results) {
             var subjects = results.map(function (res) {
                 return [res.parts.filter(function (part) {
