@@ -7,7 +7,24 @@ const port = 23333;
 const bodyParser = require('body-parser');
 const app = express();
 const cors = require("cors");
-const route = require('./route.js')
+const schedule = require('node-schedule');
+const sqlite3 = require('sqlite3').verbose();
+const { open } = require('sqlite');
+const route = require('./route.js');
+const weather = require('./interactApi.js');
+const database = require('./database.js')
+
+// run schedule task
+let job = schedule.scheduleJob('* * 4 * * *', async function() {
+    let databasePath = path.join(__dirname, '..', 'data', 'raincheckDatabase.db');
+    const sqlitedb = await open({filename: databasePath, driver: sqlite3.Database});
+    let list = await database.getUserZipcodeList(sqlitedb);
+    for (let i = 0; i < list.length; i++) {
+        let weatherData = weather.fetchWeather(sqlitedb, list[i].zipcode);
+        await database.updateWeatherData(sqlitedb, weatherData.zipcode, weatherData.pop, weatherData.temp, weatherData.name);
+    }
+    await sqlitedb.close();
+});
 
 // Use Node.js body parsing middleware
 app.use(bodyParser.json());

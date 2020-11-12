@@ -17,7 +17,7 @@ module.exports = {
                 let lon = zipcodeGeo[i]["fields"]["geopoint"][1];
                 await stmt.bind({'@zipcode': zip, '@city': city, '@state': state, '@lat': lat, '@lon': lon});
                 stmt.run();
-            } 
+            }
             await stmt.finalize();
         } catch (err) {
             throw new Error(err);
@@ -89,6 +89,11 @@ module.exports = {
         } catch (err) {
             throw new Error(err);
         }
+    },
+    getUserZipcodeList: async function (db) {
+        let stmt = await db.prepare("select zipcode from users");
+        let res = await stmt.all();
+        return res;
     },
     updateWeatherData: async function (db, zip, pop, temp, name) {
         try {
