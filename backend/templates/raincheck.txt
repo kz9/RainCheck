@@ -1,0 +1,7 @@
+Raincheck Notification from rinacheck.tk
+
+Today Weather: *||*
+Temperatire: *||*
+Probability of Raining: *||*
+
+Please don't forget to bring your umbrella!

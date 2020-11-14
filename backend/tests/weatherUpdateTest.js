@@ -11,7 +11,7 @@ async function test(){
     try {   
         let databasePath = path.join(__dirname, '..', 'data', 'raincheckDatabase.db')
         const sqlitedb = await open({filename: databasePath, driver: sqlite3.Database});
-        email.smtpsend();
+        email.smtpsend('nyaataru@gmail.com', 'Seattle', 'WA', 'Rain', '70'+'F', 90);
         //let data = await weather.fetchWeather(sqlitedb, '94203');
         //await database.updateWeatherData(sqlitedb, data[0], data[1], data[2], data[3]);
         //data = await database.getWeatherData(sqlitedb, '94203');
