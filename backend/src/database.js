@@ -79,7 +79,7 @@ module.exports = {
     },
     getRainUsers: async function (db) {
         try {
-            let stmt = await db.prepare("SELECT users.email, users.zipcode, weather.pop, weather.temp, cities.city, cities.state "+
+            let stmt = await db.prepare("SELECT users.email, users.zipcode, weather.pop, weather.temp, weather.name, cities.city, cities.state "+
                                         "FROM users INNER JOIN weather ON weather.zipcode = users.zipcode "+
                                         "INNER JOIN cities ON cities.zipcode = users.zipcode "+
                                         "WHERE weather.pop >= @pop OR weather.name = @name");

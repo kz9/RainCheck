@@ -12,10 +12,11 @@ const sqlite3 = require('sqlite3').verbose();
 const { open } = require('sqlite');
 const route = require('./route.js');
 const weather = require('./interactApi.js');
-const database = require('./database.js')
+const database = require('./database.js');
+const email = require('./email.js');
 
 // run schedule task
-let job = schedule.scheduleJob('* * 4 * * *', async function() {
+let fetchjob = schedule.scheduleJob('* * 2 * * *', async function() {
     let databasePath = path.join(__dirname, '..', 'data', 'raincheckDatabase.db');
     const sqlitedb = await open({filename: databasePath, driver: sqlite3.Database});
     let list = await database.getUserZipcodeList(sqlitedb);
@@ -24,6 +25,23 @@ let job = schedule.scheduleJob('* * 4 * * *', async function() {
         await database.updateWeatherData(sqlitedb, weatherData.zipcode, weatherData.pop, weatherData.temp, weatherData.name);
     }
     await sqlitedb.close();
+});
+
+let checkEmailJob = schedule.scheduleJob('* * 3 * * *', async function() {
+    let databasePath = path.join(__dirname, '..', 'data', 'raincheckDatabase.db');
+    const sqlitedb = await open({filename: databasePath, driver: sqlite3.Database});
+    await email(sqlitedb);
+});
+
+let sendEmail = schedule.scheduleJob('* 58 3 * * *', async function() {
+    let databasePath = path.join(__dirname, '..', 'data', 'raincheckDatabase.db');
+    const sqlitedb = await open({filename: databasePath, driver: sqlite3.Database});
+    let res = await database.getRainUsers(sqlitedb);
+    if (res) {
+        for (let i = 0; i < res.length; i++) {
+            await email.smtpsend(res[i].email, res[i].city, res[i].state, res[i].name, res[i].temp + 'F', (res[i].pop * 100) + '%');
+        }
+    }
 });
 
 // Use Node.js body parsing middleware
