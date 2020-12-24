@@ -1,38 +1,129 @@
-.App {
+@import '~antd/dist/antd.css';
+
+.page {
+  min-height: 100vh;
+  position: relative;
+  background-color: #7395ae;
+}
+
+footer, .footer {
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  height: 10vh;
+  text-align: center;
+  background-color: #45a29e;
+}
+
+header nav {
+  background-color: #557a95;
+}
+
+.rainCheckBody {
+  position: relative;
+}
+
+form button {
+  color: #66FCF1 !important;
+}
+
+main {
+  padding-bottom: 17vh;
+}
+
+/* form {
+  position: fixed !important;
+  right: 0;
+} */
+
+.subscribe {
+  position: absolute;
+  right: 0;
+  margin-right: 10px;
+}
+
+.header-form1 {
+  display: flex;
+  flex-wrap: nowrap;
+  margin: 0 auto;
+}
+
+.headerRainCheck, header, nav {
+  height: 70px;
+}
+
+.header-input {
+  width: 30vw;
+  margin: 0 auto;
+  margin-right: 0;
+}
+
+.header-button {
+  margin: 0 auto;
+  margin-left: 3px;
+}
+
+.rain-card {
+  margin: 20px;
   text-align: center;
 }
 
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
+/* * {
+  outline: 1px dashed red;
+} */
+
+/*start of weather card*/
+div.widget {
+  position: relative;
+  width: 940px;
+  height: 500px;
+  margin: 0 auto;
+  background-color: #fcfdfd;
+  border-radius: 9px;
+  padding: 25px;
+  padding-right: 30px;
+  box-shadow: 0px 17px 35px -26px lightblue;
+  margin-top: 7vh;
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
+div.left-panel {
+ 
 }
 
-.App-header {
-  background-color: #282c34;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: white;
+div.date {
+  font-size: 28px;
+  font-weight: bold;
+  color: rgba(0,0,0,0.5);
 }
 
-.App-link {
-  color: #61dafb;
+div.city {
+  font-size: 64px;
+  font-weight: bold;
+  text-transform: uppercase;
+  padding-top: 5px;
+  color: rgba(0,0,0,0.7);
 }
 
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+div.temp {
+  font-size: 42px;
+  color: rgba(0,0,0,0.9);
+  font-weight: 100;
 }
+
+div.panel {
+  display: inline-block;
+  margin-left: 150px;
+  margin-top: 110px;
+}
+
+div.right-panel {
+  position: absolute;
+  float: right;
+  top: 0;
+  margin-top: 35px;
+  margin-left: 15px;
+  padding-left: 10px;
+  margin-top: 170px;
+}
+
+/*end of weather card*/

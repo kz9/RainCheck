@@ -1,61 +1,81 @@
-import React, { Component } from 'react';  //import React component
+import React, { Component, useState } from 'react';  //import React component
 import { Link } from 'react-router-dom';
-import Subscriber from './subscribe';
-import PostUser from './talkServer';
-import GetZip from './talkServer';
+//import { Container } from './subscribe';
+//import { PostUser } from './talkServer';
+import { getPost } from './talkServer';
 import Rain from './rainCheckBody';
+import { Subscribe } from './subscriberNEW';
+import { Button, Form, Input } from 'antd';
 
 class Header extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            userEmail: '',
-            userPhone: '',
-            zipValue: ''
+            zipcode: '',
+            weather: {}
         };
 
-        this.handleUserEmail = this.handleUserEmail.bind(this);
-        this.handleUserPhone = this.handleUserPhone.bind(this);
         this.handleZipChange = this.handleZipChange.bind(this);
     }
     
-    handleUserEmail(event) {
-        this.setState({userEmail: event.target.value, userPhone: this.state.userPhone, zipValue: this.state.zipValue})
-    }
-
-    handleUserPhone(event) {
-        this.setState({userEmail: this.state.userEmail, userPhone: event.target.value, zipValue: this.state.zipValue})
-    }
-
     handleZipChange(event) {
-        this.setState({userEmail: this.state.userEmail, userPhone: this.state.userPhone, zipValue: event.target.value})
+        this.setState({zipcode: event.target.value});
+        // this.props.handleZipVal(this.state.zipcode);
     }
 
-    handleSubmit(event) {
+    // handleSubmit(event) {    //submit for zip weather lookup    (Q for Kaz: will my GetZip auto update the state for weather with data from api?)--------------------
+    //     event.preventDefault();
+    //     if (this.state.zipcode !== '') {
+    //         return (
+    //             <div>
+    //                 {GetZip.getPost()}
+    //                 <Rain weather={this.state.weather} />
+    //             </div>
+    //         );
+    //     }
+    // }    
+
+    // handleSubmit = (event) => {
+    //     this.handleSubmit(event);
+    // }
+
+    // handleSubmit(event) {    //submit for zip weather lookup    (Q for Kaz: will my GetZip auto update the state for weather with data from api?)--------------------
+    //     event.preventDefault();
+    //     if (this.state.zipcode !== '') {
+    //         {GetZip}
+    //     }
+    // }   
+
+    handleSubmit(event) {    //submit for zip weather lookup
         event.preventDefault();
-        if (this.state.zipValue !== '') {
-            <GetZip zipValue={this.state.zipValue} />
-            //<Rain zipValue={this.state.zipValue} />
+        if (this.state.zipcode !== '') {
+            // this.setState.weather = getPost(this.state.zipcode)
+            getPost(this.state.zipcode).then((res) => {
+                this.setState({weather: res});
+                this.props.handleWeatherChange1(res);
+            })
         }
-    }    
-    
-    handleNotifySubmit(event) {
-        event.preventDefault();
-        if (this.state.zipValue !== '') {
-            <Subscriber zipValue={this.state.zipValue} /> // pass the zipValue to the subscribe.js
-            
-        }
-    }    
+    }
+   
+    // handleSubscribeSubmit(event) {  //submit for subscribe to notifications w/ email
+    //     event.preventDefault();
+    //     if (event.target.zipcode.value !== '' && event.target.email.value !== '') {
+    //         <PostUser zipcode={event.target.zipcode.value} email={event.target.email.value} />
+    //     }
+    //     //console.log(event.target.zipcode.value);
+    //     //console.log(event.target.email.value)
+    // }
 
     render() {
         return (
             <div className="headerRainCheck">
-                <nav className="navbar fixed-top navbar-expand-lg navbar-light">
-                    <Link to='/' className="rainCheck"><img src="img/Umbrella.png" alt="RainCheck Icon" />RainCheck</Link>
-                    <form className="form-inline my-2 my-lg-0" onSubmit={(event) => this.handleSubmit(event)}>
-                        <input className="form-control mr-sm-2" id="zip" type="number" placeholder="Zip Code" aria-label="Search" value={this.props.zipVal} onChange={(event) => this.handleZipChange(event)} />
-                        <button className="btn btn-outline-info my-2 my-sm-0" type="submit">Search</button>
-                    </form>
+                <nav className="navbar navbar-expand-lg navbar-light">
+                    <Link to='/' className="rainCheck"><img className="headimg" src="img/umbrella.png" alt="RainCheck Icon" />RainCheck</Link>
+                    <Input className="header-input" id="zip" type="number" placeholder="Zip Code" aria-label="Search" value={this.props.zipcode} onChange={(event) => this.handleZipChange(event)} />
+                    <Button className="btn btn-outline-info header-button" onClick={(event) => this.handleSubmit(event)}>Search Me</Button>
+                    {/* <Container triggerText={'+Get Notified+'} onSubmit={this.handleSubscribeSubmit} /> */}
+                    {/* <Container triggerText={'+Get Notified+'} /> */}
+                    <Subscribe />
                 </nav>
             </div>
         );

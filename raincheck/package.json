@@ -1,15 +1,18 @@
 {
-  "name": "raincheck",
-  "version": "1.0.0",
-  "description": "Check for rain",
-  "main": "index.js",
+  "name": "raincheckfront",
+  "version": "0.1.0",
+  "private": true,
   "dependencies": {
-    "@testing-library/jest-dom": "^5.11.5",
-    "@testing-library/react": "^11.1.0",
-    "@testing-library/user-event": "^12.1.10",
+    "@testing-library/jest-dom": "^5.11.6",
+    "@testing-library/react": "^11.2.2",
+    "@testing-library/user-event": "^12.2.2",
+    "antd": "^4.9.4",
+    "bootstrap": "^4.5.3",
+    "focus-trap-react": "^8.3.1",
     "react": "^17.0.1",
     "react-dom": "^17.0.1",
-    "react-scripts": "^4.0.0",
+    "react-router-dom": "^5.2.0",
+    "react-scripts": "4.0.1",
     "web-vitals": "^0.2.4"
   },
   "scripts": {
@@ -24,16 +27,6 @@
       "react-app/jest"
     ]
   },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/kz9/RainCheck.git"
-  },
-  "author": "Eugene Lim, Kezhao Jiang",
-  "license": "ISC",
-  "bugs": {
-    "url": "https://github.com/kz9/RainCheck/issues"
-  },
-  "homepage": "https://github.com/kz9/RainCheck#readme",
   "browserslist": {
     "production": [
       ">0.2%",
