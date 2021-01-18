@@ -8,7 +8,7 @@ module.exports = {
         const config = {
             imap: {
                 user: 'mailadmin',
-                password: 'a password',
+                password: 'a13857798889',
                 host: 'smtp.raincheck.tk',
                 port: 993,
                 tls: true,
@@ -232,7 +232,7 @@ module.exports = {
                                             <br />
                                             <strong>Temperature:</strong> ${temp}
                                             <br />
-                                            <strong>Probability of Raining</strong> ${pop}%
+                                            <strong>Probability of Raining</strong> ${pop}
                                             <br />
                                           </div>
                                           <div id="umbrella">
@@ -277,7 +277,6 @@ module.exports = {
             `
         }
         let info = await transport.sendMail(message);
-        console.log(info);
         for (let i in info) {
             if (i.toString() === "envelope") {
                 let j = 0;

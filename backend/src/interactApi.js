@@ -13,14 +13,14 @@ module.exports = {
                 params: {
                     lat: latLon.lat,
                     lon: latLon.lon,
-                    exclude: "current,minutely,hourly,alerts",
+                    exclude: "current,minutely,alerts,hourly",
                     units: "imperial",
                     appid: apiKey
                 }
             });
-        let pop = res.data["daily"][0]["pop"];
-        let temp = res.data["daily"][0]["temp"]["day"];
-        let name = res.data["daily"][0]["weather"][0]["main"];
+        let pop = res.data["daily"][1]["pop"];
+        let temp = res.data["daily"][1]["temp"]["day"];
+        let name = res.data["daily"][1]["weather"][0]["main"];
         return {zipcode: zipcode, pop: pop, temp: temp, name: name};
     }
 };

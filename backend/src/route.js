@@ -28,26 +28,26 @@ module.exports = {
                 await sqlitedb.close();
             }
         } catch (err) {
-            throw new Error(err);
+            console.log(err);
         }
     },
-    userHandler: async function (req, res, next) {
+    userHandler: async function (req, res) {
         try {
-            let email = req.query.email;
-            let zipcode = req.query.zipcode;
+            let email = req.body.email;
+            let zipcode = req.body.zipcode;
             if (!zipcode || !(/^\d+$/.test(zipcode)) || !email) {
                 res.json({error: "error"});
             } else {
                 let databasePath = path.join(__dirname, '..', 'data', 'raincheckDatabase.db')
                 const sqlitedb = await open({filename: databasePath, driver: sqlite3.Database});
-                let res = await database.addOrUpdateUser(sqlitedb, email, zipcode);
+                let result = await database.addOrUpdateUser(sqlitedb, email, zipcode);
                 let weatherData = await weather.fetchWeather(sqlitedb, zipcode);
                 await database.updateWeatherData(sqlitedb, weatherData.zipcode, weatherData.pop, weatherData.temp, weatherData.name);
-                res.json({success: res});
+                res.json({success: result});
                 await sqlitedb.close();
             }
         } catch (err) {
-            throw new Error(err);
+            console.log(err);
         }
     }
 };

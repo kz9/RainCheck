@@ -14,50 +14,64 @@ const route = require('./route.js');
 const weather = require('./interactApi.js');
 const database = require('./database.js');
 const email = require('./email.js');
+const path = require("path");
 
 // run schedule task
-let fetchjob = schedule.scheduleJob('* * 2 * * *', async function() {
-    let databasePath = path.join(__dirname, '..', 'data', 'raincheckDatabase.db');
-    const sqlitedb = await open({filename: databasePath, driver: sqlite3.Database});
-    let list = await database.getUserZipcodeList(sqlitedb);
-    for (let i = 0; i < list.length; i++) {
-        let weatherData = weather.fetchWeather(sqlitedb, list[i].zipcode);
-        await database.updateWeatherData(sqlitedb, weatherData.zipcode, weatherData.pop, weatherData.temp, weatherData.name);
+let fetchjob = schedule.scheduleJob('0 0 12 * * *', async function() {
+    try {
+    	let databasePath = path.join(__dirname, '..', 'data', 'raincheckDatabase.db');
+    	const sqlitedb = await open({filename: databasePath, driver: sqlite3.Database});
+    	let list = await database.getWeatherZipcodeList(sqlitedb);
+    	for (let i = 0; i < list.length; i++) {
+    	    let weatherData = await weather.fetchWeather(sqlitedb, list[i].zipcode);
+    	    await database.updateWeatherData(sqlitedb, weatherData.zipcode, weatherData.pop, weatherData.temp, weatherData.name);
+    	}
+    	await sqlitedb.close();
+    } catch (err) {
+	console.log(err);
     }
-    await sqlitedb.close();
 });
 
-let checkEmailJob = schedule.scheduleJob('* * 3 * * *', async function() {
-    let databasePath = path.join(__dirname, '..', 'data', 'raincheckDatabase.db');
-    const sqlitedb = await open({filename: databasePath, driver: sqlite3.Database});
-    await email(sqlitedb);
+let checkEmailJob = schedule.scheduleJob('0 30 12 * * *', async function() {
+    try {
+    	let databasePath = path.join(__dirname, '..', 'data', 'raincheckDatabase.db');
+    	const sqlitedb = await open({filename: databasePath, driver: sqlite3.Database});
+    	await email.imaprecv(sqlitedb);
+    } catch (err) {
+	cosole.log(err);
+    }
 });
 
-let sendEmail = schedule.scheduleJob('* 58 3 * * *', async function() {
-    let databasePath = path.join(__dirname, '..', 'data', 'raincheckDatabase.db');
-    const sqlitedb = await open({filename: databasePath, driver: sqlite3.Database});
-    let res = await database.getRainUsers(sqlitedb);
-    if (res) {
-        for (let i = 0; i < res.length; i++) {
-            await email.smtpsend(res[i].email, res[i].city, res[i].state, res[i].name, res[i].temp + 'F', (res[i].pop * 100) + '%');
-        }
+let sendEmail = schedule.scheduleJob('0 59 12 * * *', async function() {
+    try {
+    	let databasePath = path.join(__dirname, '..', 'data', 'raincheckDatabase.db');
+    	const sqlitedb = await open({filename: databasePath, driver: sqlite3.Database});
+    	let res = await database.getRainUsers(sqlitedb);
+    	if (res) {
+    	    for (let i = 0; i < res.length; i++) {
+    	        await email.smtpsend(res[i].email, res[i].city, res[i].state, res[i].name, res[i].temp + 'F', (res[i].pop * 100) + '%');
+    	    }
+    	}
+    } catch (err) {
+	    console.log(err);
     }
 });
 
 // Use Node.js body parsing middleware
 app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({
-    extended: true,
-}));
+app.use(bodyParser.raw());
+app.use(bodyParser.urlencoded({ extended: true }));
+app.use(cors());
+//let corsOptions = {
+//    origin: [/raincheck\.tk$/,/localhost/,/127.0.0.1/],
+//    methods: ['GET', 'POST'],
+//    optionsSuccessStatus: 200
+//}
 
-let corsOptions = {
-    origin: [/raincheck\.cf$/,/localhost/],
-    methods: ['GET', 'POST'],
-    optionsSuccessStatus: 200
-}
-
-app.get('/api/getWeather', cors(corsOptions), route.weatherHandler);
-app.post('/api/addUser', cors(corsOptions), route.userHandler);
+//app.get('/api/getWeather', cors(corsOptions), route.weatherHandler);
+app.get('/api/getWeather', route.weatherHandler);
+//app.post('/api/addUser', cors(corsOptions), route.userHandler);
+app.post('/api/addUser', route.userHandler);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

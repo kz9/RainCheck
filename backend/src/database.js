@@ -20,7 +20,7 @@ module.exports = {
             }
             await stmt.finalize();
         } catch (err) {
-            throw new Error(err);
+            console.log(err);
         }
     },
     checkZipcode: async function (db, zipcode) {
@@ -33,7 +33,7 @@ module.exports = {
             }
             return true;
         } catch (err) {
-            throw new Error(err);
+            console.log(err);
         }
     },
     checkZipInWeather: async function (db, zipcode) {
@@ -46,7 +46,7 @@ module.exports = {
             }
             return true;
         } catch (err) {
-
+	    console.log(err);
         }
     },
     getZipInfo: async function (db, zipcode) {
@@ -56,7 +56,7 @@ module.exports = {
             stmt.finalize();
             return {city: results.city, state: results.state, lat: results.lat, lon: results.lon};
         } catch (err) {
-            throw new Error(err);
+            console.log(err);
         }
     },
     addOrUpdateUser: async function (db, email, zipcode) {
@@ -74,7 +74,7 @@ module.exports = {
             addStmt.finalize();
             return true;
         } catch (err) {
-            throw new Error(err);
+            console.log(err);
         }
     },
     getRainUsers: async function (db) {
@@ -87,11 +87,11 @@ module.exports = {
             await stmt.finalize();
             return results;
         } catch (err) {
-            throw new Error(err);
+            console.log(err);
         }
     },
-    getUserZipcodeList: async function (db) {
-        let stmt = await db.prepare("select zipcode from users");
+    getWeatherZipcodeList: async function (db) {
+        let stmt = await db.prepare("select zipcode from weather");
         let res = await stmt.all();
         return res;
     },
@@ -102,7 +102,7 @@ module.exports = {
             await stmt.run();
             await stmt.finalize();
         } catch (err) {
-            throw new Error(err);
+            console.log(err);
         }
     },
     getWeatherData: async function (db, zipcode) {
@@ -123,7 +123,7 @@ module.exports = {
             await weatherStmt.finalize();
             return {city: city, state: state, pop: pop, temp: temp, name: name};
         } catch (err) {
-            throw new Error(err);
+            console.log(err);
         }
     },
     deleteUser: async function (db, email) {
@@ -142,7 +142,7 @@ module.exports = {
             }
             return true
         } catch (err) {
-            throw new Error(err);
+            console.log(err);
         }
     }
 };
