@@ -5,7 +5,7 @@ const database = require('./database.js');
 
 module.exports = {
     fetchWeather: async function (db, zipcode) {
-        let apiKey = "c45594f61719575f7d835accecc4b6b5";
+        let apiKey = "<placeholder>";
 
         let latLon = await database.getZipInfo(db, zipcode);
 
