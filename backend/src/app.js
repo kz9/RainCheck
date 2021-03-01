@@ -32,30 +32,30 @@ let fetchjob = schedule.scheduleJob('0 0 12 * * *', async function() {
     }
 });
 
-let checkEmailJob = schedule.scheduleJob('0 30 12 * * *', async function() {
-    try {
-    	let databasePath = path.join(__dirname, '..', 'data', 'raincheckDatabase.db');
-    	const sqlitedb = await open({filename: databasePath, driver: sqlite3.Database});
-    	await email.imaprecv(sqlitedb);
-    } catch (err) {
-	cosole.log(err);
-    }
-});
-
-let sendEmail = schedule.scheduleJob('0 59 12 * * *', async function() {
-    try {
-    	let databasePath = path.join(__dirname, '..', 'data', 'raincheckDatabase.db');
-    	const sqlitedb = await open({filename: databasePath, driver: sqlite3.Database});
-    	let res = await database.getRainUsers(sqlitedb);
-    	if (res) {
-    	    for (let i = 0; i < res.length; i++) {
-    	        await email.smtpsend(res[i].email, res[i].city, res[i].state, res[i].name, res[i].temp + 'F', (res[i].pop * 100) + '%');
-    	    }
-    	}
-    } catch (err) {
-	    console.log(err);
-    }
-});
+//let checkEmailJob = schedule.scheduleJob('0 30 12 * * *', async function() {
+//    try {
+//    	let databasePath = path.join(__dirname, '..', 'data', 'raincheckDatabase.db');
+//    	const sqlitedb = await open({filename: databasePath, driver: sqlite3.Database});
+//    	await email.imaprecv(sqlitedb);
+//    } catch (err) {
+//	cosole.log(err);
+//    }
+//});
+//
+//let sendEmail = schedule.scheduleJob('0 59 12 * * *', async function() {
+//    try {
+//    	let databasePath = path.join(__dirname, '..', 'data', 'raincheckDatabase.db');
+//    	const sqlitedb = await open({filename: databasePath, driver: sqlite3.Database});
+//    	let res = await database.getRainUsers(sqlitedb);
+//    	if (res) {
+//    	    for (let i = 0; i < res.length; i++) {
+//    	        await email.smtpsend(res[i].email, res[i].city, res[i].state, res[i].name, res[i].temp + 'F', (res[i].pop * 100) + '%');
+//    	    }
+//    	}
+//    } catch (err) {
+//	    console.log(err);
+//    }
+//});
 
 // Use Node.js body parsing middleware
 app.use(bodyParser.json());

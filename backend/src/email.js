@@ -7,8 +7,8 @@ module.exports = {
     imaprecv: async function(db) {
         const config = {
             imap: {
-                user: 'mailadmin',
-                password: 'a13857798889',
+                user: '<placeholder>',
+                password: '<placeholder>',
                 host: 'smtp.raincheck.tk',
                 port: 993,
                 tls: true,
@@ -54,8 +54,8 @@ module.exports = {
             secure: false,
             requireTLS: true,
             auth: {
-                user: 'mailadmin',
-                pass: 'a13857798889'
+                user: '<placeholder>',
+                pass: '<placeholder>'
             }
         }
         const transport = nodemailer.createTransport(smtpConfig);
